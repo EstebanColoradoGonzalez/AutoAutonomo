@@ -31,9 +31,9 @@ void loop() {
   pararMotorA();
   delay(2000);
   retroceder();
-  delay(2000);
+  delay(1000);
   pararMotorA();
-  delay(7000);
+  delay(4000);
 }
 
 void pararMotorA() {
@@ -51,7 +51,7 @@ void retroceder() {
 }
 
 void avanzar() {
-  analogWrite(ENA, 70);
+  analogWrite(ENA, 80);
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
 }
