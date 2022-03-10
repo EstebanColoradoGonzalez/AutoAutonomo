@@ -15,6 +15,8 @@ int ECHO = 9;
 
 int DURACION;
 int distancia;
+int velocidadA;
+int velocidadB;
 
 void setup() {
   pinMode(ENA, OUTPUT);
@@ -30,6 +32,8 @@ void setup() {
 }
 
 void loop() {
+  velocidadA = 80;
+  velocidadB = 110;
   distancia = medirDistancia();
   while ( distancia > 10 && distancia < 40) {
 
@@ -37,16 +41,20 @@ void loop() {
     if (distancia == 20) {
       pararMotorA();
     }
-    if(distancia < 20 && distancia > 18){
-      retroceder(255);
+    if (distancia < 20 && distancia > 18) {
+      retroceder(velocidadA);
+      girarIzquierda(velocidadB);
     }
-    if(distancia > 20 && distancia < 22){
-      avanzar(100);
+    if (distancia > 20 && distancia < 22) {
+      avanzar(velocidadA);
+      girarDerecha(velocidadB);
     }
     distancia = medirDistancia();
     pararMotorA();
+    pararMotorB();
   }
   pararMotorA();
+  pararMotorB();
 }
 
 float medirDistancia() {
@@ -78,14 +86,14 @@ void avanzar(int velocidad) {
   digitalWrite(IN2, LOW);
 }
 
-void girarDerecha() {
-  analogWrite(ENB, 200);
+void girarDerecha(int velocidad) {
+  analogWrite(ENB, velocidad);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
 }
 
-void girarIzquierda() {
-  analogWrite(ENB, 200);
+void girarIzquierda(int velocidad) {
+  analogWrite(ENB, velocidad);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
 }
