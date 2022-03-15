@@ -26,32 +26,33 @@ void setup() {
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
   pinMode(TRIGGER, OUTPUT);
-  pinMode(ECHO, INPUT);
+  pinMode(ECHO, INPUT); 
+  digitalWrite(TRIGGER, LOW);
 
   Serial.begin(9600);
 }
 
-void loop() {
-  velocidadA = 80;
-  velocidadB = 110;
+void loop() 
+{
+  int velocidad = 255;
   distancia = medirDistancia();
-  while ( distancia > 10 && distancia < 40) {
-
-    Serial.println((String) "Distancia: " + distancia);
-    if (distancia == 20) {
+  while ( distancia > 5 && distancia < 100) 
+  {
+    if(distancia < 20)
+    {
+      retroceder(velocidad);
+    }
+    else if (distancia > 20)
+    {
+      avanzar(velocidad);
+    } 
+    else
+    {
       pararMotorA();
+      pararMotorB();
     }
-    if (distancia < 20 && distancia > 18) {
-      retroceder(velocidadA);
-      girarIzquierda(velocidadB);
-    }
-    if (distancia > 20 && distancia < 22) {
-      avanzar(velocidadA);
-      girarDerecha(velocidadB);
-    }
+    
     distancia = medirDistancia();
-    pararMotorA();
-    pararMotorB();
   }
   pararMotorA();
   pararMotorB();
@@ -59,7 +60,7 @@ void loop() {
 
 float medirDistancia() {
   digitalWrite(TRIGGER, HIGH);
-  delayMicroseconds(10);
+  delayMicroseconds(10);          //Enviamos un pulso de 10us
   digitalWrite(TRIGGER, LOW);
 
   DURACION = pulseIn(ECHO, HIGH);
@@ -74,25 +75,37 @@ void pararMotorB() {
   analogWrite(ENB, 0);
 }
 
-void retroceder(int velocidad) {
-  analogWrite(ENA, velocidad);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+void avanzar(int velocidad)
+{
+  girarLlantaIzquierdaHaciaAdelante(velocidad);
+  girarLlantaDerechaHaciaAdelante(velocidad);
 }
 
-void avanzar(int velocidad) {
+void retroceder(int velocidad)
+{
+  girarLlantaIzquierdaHaciaAtras(velocidad);
+  girarLlantaDerechaHaciaAtras(velocidad);
+}
+
+void girarLlantaIzquierdaHaciaAtras(int velocidad) {
   analogWrite(ENA, velocidad);
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
 }
 
-void girarDerecha(int velocidad) {
+void girarLlantaDerechaHaciaAtras(int velocidad) {
   analogWrite(ENB, velocidad);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
 }
 
-void girarIzquierda(int velocidad) {
+void girarLlantaIzquierdaHaciaAdelante(int velocidad) {
+  analogWrite(ENA, velocidad);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+}
+
+void girarLlantaDerechaHaciaAdelante(int velocidad) {
   analogWrite(ENB, velocidad);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
