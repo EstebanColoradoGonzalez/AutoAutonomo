@@ -26,32 +26,33 @@ void setup() {
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
   pinMode(TRIGGER, OUTPUT);
-  pinMode(ECHO, INPUT); 
+  pinMode(ECHO, INPUT);
   digitalWrite(TRIGGER, LOW);
 
   Serial.begin(9600);
 }
 
-void loop() 
+void loop()
 {
-  int velocidad = 255;
+  int velocidad = 77;
   distancia = medirDistancia();
-  while ( distancia > 5 && distancia < 100) 
+  while ( distancia > 5 && distancia < 100)
   {
-    if(distancia < 20)
+    Serial.println((String)"Distance: "+ distancia);
+    if (distancia < 19)
     {
       retroceder(velocidad);
     }
-    else if (distancia > 20)
+    else if (distancia > 21)
     {
       avanzar(velocidad);
-    } 
+    }
     else
     {
       pararMotorA();
       pararMotorB();
     }
-    
+
     distancia = medirDistancia();
   }
   pararMotorA();
