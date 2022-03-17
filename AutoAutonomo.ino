@@ -15,8 +15,7 @@ int ECHO = 9;
 
 int DURACION;
 int distancia;
-int velocidadA;
-int velocidadB;
+int velocidad = 77;
 
 void setup() {
   pinMode(ENA, OUTPUT);
@@ -34,7 +33,6 @@ void setup() {
 
 void loop()
 {
-  int velocidad = 77;
   distancia = medirDistancia();
   while ( distancia > 5 && distancia < 100)
   {
@@ -76,37 +74,37 @@ void pararMotorB() {
   analogWrite(ENB, 0);
 }
 
-void avanzar(int velocidad)
-{
-  girarLlantaIzquierdaHaciaAdelante(velocidad);
-  girarLlantaDerechaHaciaAdelante(velocidad);
-}
-
 void retroceder(int velocidad)
 {
   girarLlantaIzquierdaHaciaAtras(velocidad);
   girarLlantaDerechaHaciaAtras(velocidad);
 }
 
-void girarLlantaIzquierdaHaciaAtras(int velocidad) {
+void avanzar(int velocidad)
+{
+  girarLlantaIzquierdaHaciaAdelante(velocidad);
+  girarLlantaDerechaHaciaAdelante(velocidad);
+}
+
+void girarLlantaIzquierdaHaciaAdelante(int velocidad) {
   analogWrite(ENA, velocidad);
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
 }
 
-void girarLlantaDerechaHaciaAtras(int velocidad) {
+void girarLlantaDerechaHaciaAdelante(int velocidad) {
   analogWrite(ENB, velocidad);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
 }
 
-void girarLlantaIzquierdaHaciaAdelante(int velocidad) {
+void girarLlantaIzquierdaHaciaAtras(int velocidad) {
   analogWrite(ENA, velocidad);
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
 }
 
-void girarLlantaDerechaHaciaAdelante(int velocidad) {
+void girarLlantaDerechaHaciaAtras(int velocidad) {
   analogWrite(ENB, velocidad);
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
