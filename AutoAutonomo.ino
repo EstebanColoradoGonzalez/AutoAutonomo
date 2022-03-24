@@ -76,6 +76,16 @@ void retroceder(int velocidadA, int velocidadB) {
   girarLlantaDerechaHaciaAtras(velocidadB);
 }
 
+void Izquierda(int velocidadA, int velocidadB) {
+  girarLlantaIzquierdaHaciaAdelante(velocidadA);
+  girarLlantaDerechaHaciaAtras(velocidadB);
+}
+
+void Derecha(int velocidadA, int velocidadB) {
+  girarLlantaIzquierdaHaciaAtras(velocidadA);
+  girarLlantaDerechaHaciaAdelante(velocidadB);
+}
+
 void girarLlantaIzquierdaHaciaAtras(int velocidad) {
   analogWrite(ENA, velocidad);
   digitalWrite(IN1, HIGH);
