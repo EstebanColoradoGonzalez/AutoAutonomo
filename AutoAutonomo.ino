@@ -13,10 +13,19 @@ int IN3 = 7;
 int TRIGGER = 8;
 int ECHO = 9;
 
-int DURACION;
-int distancia;
-int velocidadA = 70;
-int velocidadB = 100;
+float DURACION;
+float distancia;
+//int velocidadA = 70;
+//int velocidadB = 100;
+
+//Mathematical model
+float valorDeseado = 20;
+//float k1 = 20 / 3;
+//float k2 = 8;
+float k1 = 20 / 6;
+float k2 = 6;
+float error;
+//float distance[5];
 
 void setup() {
   pinMode(ENA, OUTPUT);
@@ -33,21 +42,63 @@ void setup() {
 }
 
 void loop() {
-  distancia = medirDistancia();
-  Serial.println((String) "Distancia: " + distancia);
-  if ( distancia > 5 && distancia < 100) {
-    if (distancia <= 19) {
-      retroceder(velocidadA, velocidadB);
-      Serial.println("Retrocede");
-    } else if (distancia >= 21) {
-      avanzar(velocidadA, velocidadB);
-      Serial.println("Avanza");
+  //llenarVector();
+  //vaciarVector();
+  //Serial.println((String) "Distancia: " + medirDistancia());
+    error = calcularError();
+    //Serial.println((String) "Error: " + error);
+    //Serial.println((String) "velocidad: " + calcularVelocidadM1(error));
+    //Serial.println((String) "velocidad2: " + calcularVelocidadM2(error));
+    if (error > 0) {
+      retroceder(calcularVelocidadM1(error), calcularVelocidadM2);
+      //Serial.println("Retrocede");
+    } else if (error < 0) {
+      avanzar(calcularVelocidadM1(error), calcularVelocidadM2(error));
+      //Serial.println("Avanza");
     } else {
       pararMotorA();
       pararMotorB();
     }
+ //delay(2000);
+}
+
+float calcularError() {
+  return valorDeseado - medirDistancia();
+}
+
+int calcularVelocidadM1(float error) {
+  if(abs(error) * k1 > 255){
+    return 255;
+  }else{
+    return (int) abs(error) * k1;
+  }
+  
+}
+
+int calcularVelocidadM2(float error) {
+   if(abs(error) * k2 > 233){
+    return 233;
+  }else{
+   return (int) abs(error) * k2;
   }
 }
+
+/*
+  void llenarVector() {
+  for (int index = 0; index < 5; index++) {
+    distance[index] = medirDistancia();
+    //distance[index] = 5;
+    Serial.println(distance[index]);
+  }
+  }
+
+  void vaciarVector(){
+  for (int index = 0; index < 5; index++) {
+    distance[index] = 0;
+    Serial.println(distance[index]);
+  }
+  }
+*/
 
 float medirDistancia() {
   digitalWrite(TRIGGER, HIGH);
@@ -55,6 +106,9 @@ float medirDistancia() {
   digitalWrite(TRIGGER, LOW);
 
   DURACION = pulseIn(ECHO, HIGH);
+  if(DURACION / 59 < 0){
+    medirDistancia();
+  }
   return DURACION / 59;
 }
 
@@ -66,12 +120,12 @@ void pararMotorB() {
   analogWrite(ENB, 0);
 }
 
-void avanzar(int velocidadA, int velocidadB) {
+void retroceder(int velocidadA, int velocidadB) {
   girarLlantaIzquierdaHaciaAdelante(velocidadA);
   girarLlantaDerechaHaciaAdelante(velocidadB);
 }
 
-void retroceder(int velocidadA, int velocidadB) {
+void avanzar(int velocidadA, int velocidadB) {
   girarLlantaIzquierdaHaciaAtras(velocidadA);
   girarLlantaDerechaHaciaAtras(velocidadB);
 }
