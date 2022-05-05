@@ -5,7 +5,6 @@
 /*
    Modulo L298N (Puente H) --> Control motores DC
    cosntantes de las conexiones de cada uno de los pines L298N/Arduino
-
 */
 #define ENA  3
 #define IN1  2
@@ -17,7 +16,6 @@
 
 /*
    Sensor Ultrasonido analogico SH-05
-
 */
 #define TRIGGER 8
 #define ECHO  9
@@ -40,10 +38,17 @@ float error;
 Average<float> distancias(5);
 
 /*
-   LED azul indicador de proceso retroceder
-
+    LED azul indicador de proceso retroceder
 */
 #define LED_RETROCESO 13
+
+/*
+   Sensor Infrarojo
+*/
+#define ObstaculoDerecha = 10;
+#define ObstaculoIzquierda = 11;
+int obstaculoDerechaLectura = HIGH;
+int ObstaculoIzquierdaLectura = HIGH;
 
 void setup() {
   // pines motores
@@ -61,6 +66,10 @@ void setup() {
 
   // pin LED
   pinMode(LED_RETROCESO, OUTPUT);
+
+  // IR pin
+  pinMode(ObstaculoDerecha, INPUT);
+  pinMode(ObstaculoIzquierda, INPUT);
 
   Serial.begin(9600);
 }
@@ -141,7 +150,6 @@ int medirDistancia() {
 
 /*
    Métodos para el control de los motoreductores DC
-
 */
 void pararMotorA() {
   analogWrite(ENA, 0);
@@ -199,20 +207,16 @@ void girarLlantaDerechaHaciaAdelante(int velocidad) {
 
 
 /**
- *int LED = 13;
-int isObstaclePin1 = 8; 
-int isObstaclePin2 = 9; 
-int isObstacle1 = HIGH;
-int isObstacle2 = HIGH;
 
-void setup() {
+
+  void setup() {
   pinMode(LED, OUTPUT);
   pinMode(isObstaclePin1, INPUT);
   pinMode(isObstaclePin2, INPUT);
   Serial.begin(9600);
-}
+  }
 
-void loop() {
+  void loop() {
   isObstacle1 = digitalRead(isObstaclePin1);
   isObstacle2 = digitalRead(isObstaclePin2);
   if (isObstacle1 == LOW && isObstacle2 == LOW) {
@@ -230,6 +234,6 @@ void loop() {
     digitalWrite(LED, LOW);
   }
 
-} 
+  }
  **/
- */
+* /
