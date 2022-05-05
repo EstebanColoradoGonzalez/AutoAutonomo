@@ -1,7 +1,6 @@
 // Importaciónde de Librerias
 #include <Average.h>
 
-
 /*
    Modulo L298N (Puente H) --> Control motores DC
    cosntantes de las conexiones de cada uno de los pines L298N/Arduino
@@ -23,16 +22,14 @@
 float DURACION;
 float distancia;
 
-
 /*
    Modelo de control
    definimos el valor deseado, así como las las contantes para cada unos de los motores.
    variables para calculos
-
 */
 float valorDeseado = 20;
 #define kl 4
-#define kr 7
+#define VelocidadGiro 10
 float mDistancia;
 float error;
 Average<float> distancias(5);
@@ -45,9 +42,9 @@ Average<float> distancias(5);
 /*
    Sensor Infrarojo
 */
-#define ObstaculoDerecha = 10;
-#define ObstaculoIzquierda = 11;
-int obstaculoDerechaLectura = HIGH;
+#define ObstaculoDerecha 10
+#define ObstaculoIzquierda 11
+int ObstaculoDerechaLectura = HIGH;
 int ObstaculoIzquierdaLectura = HIGH;
 
 void setup() {
@@ -71,63 +68,55 @@ void setup() {
   pinMode(ObstaculoDerecha, INPUT);
   pinMode(ObstaculoIzquierda, INPUT);
 
-  Serial.begin(9600);
+  //Serial.begin(9600);
 }
 
 void loop() {
   mDistancia = calcularModa();
-  //int MDistancia = distancias.mean();
-  //Serial.println("-------------");
-  //Serial.println((String) "Moda: " + mDistancia);
-  //Serial.println((String) "Media: " + MDistancia);
   error = calcularError(mDistancia);
-  //Serial.println((String) "error: "+error);
-  //girarLlantaDerechaHaciaAdelante(calcularVelocidadM2(error));
-  //Serial.println("-------------------");
-  //Serial.println((String) "Distancia: " + medirDistancia());
+
+  ObstaculoDerechaLectura = digitalRead(ObstaculoDerecha);
+  ObstaculoIzquierdaLectura = digitalRead(ObstaculoIzquierda);
+
+  if (ObstaculoDerechaLectura == HIGH && ObstaculoIzquierdaLectura == LOW) {
+    Izquierda(calcularVelocidad(2));
+  } else if (ObstaculoIzquierdaLectura == LOW && ObstaculoDerechaLectura == HIGH) {
+    Derecha(calcularVelocidad(2));
+  }
+
   if (error > 0) {
-    retroceder(calcularVelocidadM2(error), calcularVelocidadM2(error));
+    retroceder(calcularVelocidad(error));
     digitalWrite(LED_RETROCESO, HIGH);
   } else if (error < 0) {
-    avanzar(calcularVelocidadM1(error), calcularVelocidadM1(error));
-    digitalWrite(LED_RETROCESO, LOW);
-  } else {
-    pararMotorA();
-    pararMotorB();
+    avanzar(calcularVelocidad(error));
     digitalWrite(LED_RETROCESO, LOW);
   }
+  pararMotorA();
+  pararMotorB();
+  digitalWrite(LED_RETROCESO, LOW);
+
   //delay(1000);
 }
 
+
+
 /*
    Métodos matemáticos para el control
-
 */
 int calcularModa() {
   llenarDistancias();
-  //delay(1000);
   return distancias.mode();
-
 }
 
 float calcularError(int rmDistancia) {
   return valorDeseado - rmDistancia;
 }
 
-int calcularVelocidadM1(float error) {
-  if (abs(error) * kl > 255) {
+int calcularVelocidad(float dato) {
+  if (abs(dato) * kl > 255) {
     return 255;
   } else {
-    return (int) abs(error) * kl;
-  }
-
-}
-
-int calcularVelocidadM2(float error) {
-  if (abs(error) * kr > 255) {
-    return 255;
-  } else {
-    return (int) abs(error) * kr;
+    return (int) abs(dato) * kl;
   }
 }
 
@@ -135,8 +124,6 @@ void llenarDistancias() {
   for (int index = 0; index < 5; index++) {
     int d = medirDistancia();
     distancias.push(d);
-    //Serial.println((String) "Distancia: " + d);
-    //Serial.println(distance[index]);
   }
 }
 
@@ -159,28 +146,29 @@ void pararMotorB() {
   analogWrite(ENB, 0);
 }
 
-void avanzar(int velocidadA, int velocidadB) {
-  girarLlantaIzquierdaHaciaAdelante(velocidadA);
-  girarLlantaDerechaHaciaAdelante(velocidadB);
-  Serial.println("Avanza");
+void avanzar(int velocidad) {
+  girarLlantaIzquierdaHaciaAdelante(velocidad);
+  girarLlantaDerechaHaciaAdelante(velocidad);
+  //Serial.println("Avanza");
 }
 
-void retroceder(int velocidadA, int velocidadB) {
-  girarLlantaIzquierdaHaciaAtras(velocidadA);
-  girarLlantaDerechaHaciaAtras(velocidadB);
-  Serial.println("Retrocede");
+void retroceder(int velocidad) {
+  girarLlantaIzquierdaHaciaAtras(velocidad);
+  girarLlantaDerechaHaciaAtras(velocidad);
+  //Serial.println("Retrocede");
 }
 
-void Izquierda(int velocidadA, int velocidadB) {
-  girarLlantaIzquierdaHaciaAdelante(velocidadA);
-  girarLlantaDerechaHaciaAtras(velocidadB);
+void Izquierda(int velocidad) {
+  girarLlantaIzquierdaHaciaAdelante(velocidad);
+  girarLlantaDerechaHaciaAtras(velocidad);
 }
 
-void Derecha(int velocidadA, int velocidadB) {
-  girarLlantaIzquierdaHaciaAtras(velocidadA);
-  girarLlantaDerechaHaciaAdelante(velocidadB);
+void Derecha(int velocidad) {
+  girarLlantaIzquierdaHaciaAtras(velocidad);
+  girarLlantaDerechaHaciaAdelante(velocidad);
 }
 
+// LLantas
 void girarLlantaIzquierdaHaciaAtras(int velocidad) {
   analogWrite(ENA, velocidad);
   digitalWrite(IN1, HIGH);
@@ -204,36 +192,3 @@ void girarLlantaDerechaHaciaAdelante(int velocidad) {
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
 }
-
-
-/**
-
-
-  void setup() {
-  pinMode(LED, OUTPUT);
-  pinMode(isObstaclePin1, INPUT);
-  pinMode(isObstaclePin2, INPUT);
-  Serial.begin(9600);
-  }
-
-  void loop() {
-  isObstacle1 = digitalRead(isObstaclePin1);
-  isObstacle2 = digitalRead(isObstaclePin2);
-  if (isObstacle1 == LOW && isObstacle2 == LOW) {
-    Serial.println("GIRAR: NO GIRAR");
-    digitalWrite(LED, HIGH);
-  } else if(isObstacle1 == LOW){
-    Serial.println("GIRAR: IZQUIERDA");
-    digitalWrite(LED, HIGH);
-  }
-  else if(isObstacle2 == LOW){
-    Serial.println("GIRAR: DERECHA");
-    digitalWrite(LED, HIGH);
-  }else {
-    Serial.println("GIRAR: NO GIRAR");
-    digitalWrite(LED, LOW);
-  }
-
-  }
- **/
-* /
