@@ -29,7 +29,7 @@ float distancia;
 */
 float valorDeseado = 20;
 #define kl 4
-#define VelocidadGiro 10
+#define VelocidadGiro 20
 float mDistancia;
 float error;
 Average<float> distancias(5);
@@ -72,30 +72,31 @@ void setup() {
 }
 
 void loop() {
-  mDistancia = calcularModa();
-  error = calcularError(mDistancia);
-
   ObstaculoDerechaLectura = digitalRead(ObstaculoDerecha);
   ObstaculoIzquierdaLectura = digitalRead(ObstaculoIzquierda);
 
   if (ObstaculoDerechaLectura == HIGH && ObstaculoIzquierdaLectura == LOW) {
-    Izquierda(calcularVelocidad(2));
-  } else if (ObstaculoIzquierdaLectura == LOW && ObstaculoDerechaLectura == HIGH) {
-    Derecha(calcularVelocidad(2));
-  }
+    Izquierda(calcularVelocidad(VelocidadGiro));
+  } else if (ObstaculoDerechaLectura == LOW && ObstaculoIzquierdaLectura == HIGH) {
+    Derecha(calcularVelocidad(VelocidadGiro));
+  } else {
+    mDistancia = calcularModa();
+    error = calcularError(mDistancia);
 
-  if (error > 0) {
-    retroceder(calcularVelocidad(error));
-    digitalWrite(LED_RETROCESO, HIGH);
-  } else if (error < 0) {
-    avanzar(calcularVelocidad(error));
-    digitalWrite(LED_RETROCESO, LOW);
-  }
-  pararMotorA();
-  pararMotorB();
-  digitalWrite(LED_RETROCESO, LOW);
+    if (error > 0) {
+      retroceder(calcularVelocidad(error));
+      digitalWrite(LED_RETROCESO, HIGH);
+    } else if (error < 0) {
+      avanzar(calcularVelocidad(error));
+      digitalWrite(LED_RETROCESO, LOW);
+    } else {
+      pararMotorA();
+      pararMotorB();
+      digitalWrite(LED_RETROCESO, LOW);
+    }
 
-  //delay(1000);
+  }
+  //edelay(1000);
 }
 
 
@@ -160,12 +161,14 @@ void retroceder(int velocidad) {
 
 void Izquierda(int velocidad) {
   girarLlantaIzquierdaHaciaAdelante(velocidad);
-  girarLlantaDerechaHaciaAtras(velocidad);
+  girarLlantaDerechaHaciaAtras(0);
+  //Serial.println("Izquierda");
 }
 
 void Derecha(int velocidad) {
-  girarLlantaIzquierdaHaciaAtras(velocidad);
+  girarLlantaIzquierdaHaciaAtras(0);
   girarLlantaDerechaHaciaAdelante(velocidad);
+ // Serial.println("Derecha");
 }
 
 // LLantas
