@@ -28,8 +28,8 @@ float distancia;
    variables para calculos
 */
 float valorDeseado = 20;
-#define kl 4
-#define VelocidadGiro 20
+#define kl 3
+#define VelocidadGiro 18
 float mDistancia;
 float error;
 Average<float> distancias(5);
@@ -161,12 +161,12 @@ void retroceder(int velocidad) {
 
 void Izquierda(int velocidad) {
   girarLlantaIzquierdaHaciaAdelante(velocidad);
-  girarLlantaDerechaHaciaAtras(0);
+  girarLlantaDerechaHaciaAtras(velocidad);
   //Serial.println("Izquierda");
 }
 
 void Derecha(int velocidad) {
-  girarLlantaIzquierdaHaciaAtras(0);
+  girarLlantaIzquierdaHaciaAtras(velocidad);
   girarLlantaDerechaHaciaAdelante(velocidad);
  // Serial.println("Derecha");
 }
