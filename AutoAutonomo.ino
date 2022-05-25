@@ -28,8 +28,9 @@ float distancia;
    variables para calculos
 */
 float valorDeseado = 20;
-#define kl 3
-#define VelocidadGiro 18
+#define kl 20
+#define kr 70
+#define VelocidadGiro 100
 float mDistancia;
 float error;
 Average<float> distancias(5);
@@ -37,13 +38,13 @@ Average<float> distancias(5);
 /*
     LED azul indicador de proceso retroceder
 */
-#define LED_RETROCESO 13
+//#define LED_RETROCESO 13
 
 /*
    Sensor Infrarojo
 */
-#define ObstaculoDerecha 10
-#define ObstaculoIzquierda 11
+#define ObstaculoDerecha 12
+#define ObstaculoIzquierda 13
 int ObstaculoDerechaLectura = HIGH;
 int ObstaculoIzquierdaLectura = HIGH;
 
@@ -62,13 +63,13 @@ void setup() {
   digitalWrite(TRIGGER, LOW);
 
   // pin LED
-  pinMode(LED_RETROCESO, OUTPUT);
+  //pinMode(LED_RETROCESO, OUTPUT);
 
   // IR pin
   pinMode(ObstaculoDerecha, INPUT);
   pinMode(ObstaculoIzquierda, INPUT);
 
-  //Serial.begin(9600);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -76,27 +77,25 @@ void loop() {
   ObstaculoIzquierdaLectura = digitalRead(ObstaculoIzquierda);
 
   if (ObstaculoDerechaLectura == HIGH && ObstaculoIzquierdaLectura == LOW) {
-    Izquierda(calcularVelocidad(VelocidadGiro));
+    Izquierda(VelocidadGiro);
+    pararMotorB();
   } else if (ObstaculoDerechaLectura == LOW && ObstaculoIzquierdaLectura == HIGH) {
-    Derecha(calcularVelocidad(VelocidadGiro));
+    Derecha(VelocidadGiro);
+    pararMotorA();
   } else {
-    mDistancia = calcularModa();
+    mDistancia = medirDistancia();
     error = calcularError(mDistancia);
-
     if (error > 0) {
-      retroceder(calcularVelocidad(error));
-      digitalWrite(LED_RETROCESO, HIGH);
+      retroceder(calcularVelocidadR(error));
+      Serial.println("FF");
     } else if (error < 0) {
-      avanzar(calcularVelocidad(error));
-      digitalWrite(LED_RETROCESO, LOW);
+      avanzar(calcularVelocidadA(error));
+      Serial.println("F");
     } else {
       pararMotorA();
       pararMotorB();
-      digitalWrite(LED_RETROCESO, LOW);
     }
-
   }
-  //edelay(1000);
 }
 
 
@@ -113,8 +112,15 @@ float calcularError(int rmDistancia) {
   return valorDeseado - rmDistancia;
 }
 
-int calcularVelocidad(float dato) {
+int calcularVelocidadR(int dato) {
   if (abs(dato) * kl > 255) {
+    return 255;
+  } else {
+    return (int) abs(dato) * kl;
+  }
+}
+int calcularVelocidadA(int dato) {
+  if (abs(dato) * kr > 255) {
     return 255;
   } else {
     return (int) abs(dato) * kl;
@@ -150,25 +156,23 @@ void pararMotorB() {
 void avanzar(int velocidad) {
   girarLlantaIzquierdaHaciaAdelante(velocidad);
   girarLlantaDerechaHaciaAdelante(velocidad);
-  //Serial.println("Avanza");
 }
 
 void retroceder(int velocidad) {
   girarLlantaIzquierdaHaciaAtras(velocidad);
   girarLlantaDerechaHaciaAtras(velocidad);
-  //Serial.println("Retrocede");
 }
 
 void Izquierda(int velocidad) {
-  girarLlantaIzquierdaHaciaAdelante(velocidad);
-  girarLlantaDerechaHaciaAtras(velocidad);
-  //Serial.println("Izquierda");
+  girarLlantaIzquierdaHaciaAtras(velocidad);
+  //girarLlantaDerechaHaciaAtras(velocidad);
+  Serial.println("D");
 }
 
 void Derecha(int velocidad) {
-  girarLlantaIzquierdaHaciaAtras(velocidad);
-  girarLlantaDerechaHaciaAdelante(velocidad);
- // Serial.println("Derecha");
+  //girarLlantaIzquierdaHaciaAtras(velocidad);
+  girarLlantaDerechaHaciaAtras(velocidad);
+  Serial.println("L");
 }
 
 // LLantas
